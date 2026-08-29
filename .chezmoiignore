@@ -1,0 +1,14 @@
+# Common
+README.md
+LICENSE
+.git/
+.github/
+.pre-commit-config.yaml
+
+# 중요 파일
+.ssh/id_*
+.aws/credentials
+.gnupg/
+.kube/config
+**/.env
+**/*.pem

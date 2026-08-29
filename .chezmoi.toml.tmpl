@@ -1,0 +1,10 @@
+{{- $name          := promptStringOnce . "name" "git user.name" "jb.cho" -}}
+{{- $githubUser    := promptStringOnce . "githubUser" "personal GitHub username" "junbeom-cho" -}}
+{{- $personalEmail := promptStringOnce . "personalEmail" "personal git email" -}}
+{{- $defaultEmail  := promptStringOnce . "defaultEmail" "이 머신의 기본 git email (개인용 머신이면 Enter)" $personalEmail -}}
+
+[data]
+    name          = {{ $name | quote }}
+    githubUser    = {{ $githubUser | quote }}
+    personalEmail = {{ $personalEmail | quote }}
+    defaultEmail  = {{ $defaultEmail | quote }}

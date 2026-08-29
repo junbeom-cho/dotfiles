@@ -1,0 +1,12 @@
+[user]
+	name = {{ .name }}
+	email = {{ .defaultEmail }}
+[init]
+	defaultBranch = main
+[pull]
+	rebase = true
+
+[includeIf "hasconfig:remote.*.url:git@github.com:{{ .githubUser }}/**"]
+	path = ~/.config/git/personal
+[includeIf "hasconfig:remote.*.url:https://github.com/{{ .githubUser }}/**"]
+	path = ~/.config/git/personal
