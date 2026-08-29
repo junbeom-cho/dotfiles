@@ -1,0 +1,12 @@
+#!/bin/sh
+# Brewfile 이 바뀔 때만 실행됨 (아래 해시가 스크립트 내용을 바꾸는 방식)
+# Brewfile hash: {{ include "private_dot_homebrew/Brewfile" | sha256sum }}
+set -eu
+
+command -v brew >/dev/null 2>&1 || {
+	echo "Homebrew 미설치 — 패키지 설치를 건너뜁니다. 필요하면 https://brew.sh 참고"
+	exit 0
+}
+
+echo "==> brew bundle (Brewfile 변경 감지)"
+brew bundle --global --no-upgrade

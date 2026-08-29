@@ -77,11 +77,37 @@ clone → 프롬프트 응답 → 홈 디렉터리 적용까지 한 번에 실�
 
 | 파일 | 비고 |
 |---|---|
+| `~/.zprofile` | Homebrew `shellenv`, PATH. OS/아키텍처별 분기 |
 | `~/.zshrc` | OS/아키텍처별 Homebrew 경로 분기, 미설치 도구는 자동 skip |
 | `~/.gitconfig` | 이메일 템플릿 + 개인/기본 분기 |
 | `~/.config/git/personal` | 개인 이메일 override |
+| `~/.homebrew/Brewfile` | 설치할 패키지 목록 (formula / cask / VS Code 확장) |
+
+## 패키지 관리
+
+`~/.homebrew/Brewfile` 에 formula / cask / VS Code 확장 목록이 들어 있고, 이 파일이 바뀌면
+`chezmoi apply` 시 `run_onchange_before_10-install-packages.sh` 가 `brew bundle` 을 돌립니다.
+Homebrew 가 없는 환경(Linux / Windows)에서는 안내만 출력하고 건너뜁니다.
+
+**목록 갱신** — 새 패키지를 설치했으면 현재 상태를 그대로 덤프해서 반영합니다.
+
+```shell
+brew bundle dump --global --force   # 설치 상태 → ~/.homebrew/Brewfile
+chezmoi add ~/.homebrew/Brewfile    # 소스에 반영
+```
+
+이 파일을 템플릿(`.tmpl`)으로 만들지 않은 이유가 여기 있습니다. `dump` 가 파일을 통째로
+덮어쓰기 때문에 템플릿이면 조건문이 매번 날아갑니다. OS 분기는 파일이 아니라 설치 스크립트에
+두었습니다.
+
+**다른 머신에 반영** — `chezmoi update` 한 번이면 pull → apply → 패키지 설치까지 이어집니다.
+
+> 도킹스테이션 드라이버나 주변기기 유틸리티처럼 특정 기기에서만 의미 있는 cask 는
+> 덤프 후 손으로 빼주세요. 회사/개인 Brewfile 분리는 두 번째 Mac 이 생기면 그때 합니다.
 
 ## 요구사항 / 현재 한계
 
 - git 2.36 이상 (`hasconfig` includeIf 사용)
-- `.zshrc` 가 참조하는 도구(oh-my-zsh, powerlevel10k, lsd, bat, zsh-autosuggestions, zsh-syntax-highlighting, jenv, nvm)는 **아직 자동 설치되지 않습니다.** 설치돼 있지 않으면 에러 없이 건너뜁니다.
+- Homebrew 자체는 자동 설치하지 않습니다. 없으면 패키지 설치를 건너뛰므로 [brew.sh](https://brew.sh) 를 보고 먼저 설치하세요.
+- oh-my-zsh 는 아직 Brewfile 로 관리되지 않습니다. 없으면 `.zshrc` 가 에러 없이 건너뜁니다.
+- Linux / Windows 용 패키지 설치는 아직 없습니다. macOS 만 자동화돼 있습니다.

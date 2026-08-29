@@ -1,0 +1,11 @@
+{{- $brew := ternary "/opt/homebrew" "/usr/local" (eq .chezmoi.arch "arm64") -}}
+{{ if eq .chezmoi.os "darwin" -}}
+[ -x "{{ $brew }}/bin/brew" ] && eval "$({{ $brew }}/bin/brew shellenv zsh)"
+{{- else -}}
+[ -x /home/linuxbrew/.linuxbrew/bin/brew ] && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+{{- end }}
+
+# Added by OrbStack: command-line tools and integration
+[ -r ~/.orbstack/shell/init.zsh ] && source ~/.orbstack/shell/init.zsh
+
+export PATH="$HOME/.local/bin:$PATH"
