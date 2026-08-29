@@ -6,6 +6,11 @@
 [pull]
 	rebase = true
 
+# ~/projects/personal/ 아래 레포는 remote 유무와 무관하게 개인 메일
+[includeIf "gitdir:~/projects/personal/"]
+	path = ~/.config/git/personal
+
+# personal GitHub remote 를 가진 레포는 위치와 무관하게 개인 메일 (git >= 2.36)
 [includeIf "hasconfig:remote.*.url:git@github.com:{{ .githubUser }}/**"]
 	path = ~/.config/git/personal
 [includeIf "hasconfig:remote.*.url:https://github.com/{{ .githubUser }}/**"]
