@@ -1,6 +1,7 @@
 #!/bin/sh
 # Brewfile 이 바뀔 때만 실행됨 (아래 해시가 스크립트 내용을 바꾸는 방식)
-# Brewfile hash: {{ include "private_dot_homebrew/Brewfile" | sha256sum }}
+# Brewfile hash:          {{ include "private_dot_homebrew/Brewfile" | sha256sum }}
+# Brewfile.optional hash: {{ include "private_dot_homebrew/Brewfile.optional" | sha256sum }}
 set -eu
 
 command -v brew >/dev/null 2>&1 || {
@@ -10,3 +11,9 @@ command -v brew >/dev/null 2>&1 || {
 
 echo "==> brew bundle (Brewfile 변경 감지)"
 brew bundle --global --no-upgrade
+
+optional="$HOME/.homebrew/Brewfile.optional"
+if [ -f "$optional" ] && grep -qE '^[[:space:]]*(brew|cask|tap|mas|vscode|npm)[[:space:]]' "$optional"; then
+	echo "==> brew bundle (Brewfile.optional)"
+	brew bundle --file="$optional" --no-upgrade
+fi

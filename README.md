@@ -81,7 +81,8 @@ clone → 프롬프트 응답 → 홈 디렉터리 적용까지 한 번에 실�
 | `~/.zshrc` | OS/아키텍처별 Homebrew 경로 분기, 미설치 도구는 자동 skip |
 | `~/.gitconfig` | 이메일 템플릿 + 개인/기본 분기 |
 | `~/.config/git/personal` | 개인 이메일 override |
-| `~/.homebrew/Brewfile` | 설치할 패키지 목록 (formula / cask / VS Code 확장) |
+| `~/.homebrew/Brewfile` | 설치할 패키지 목록 (formula / cask / VS Code 확장). `dump` 가 덮어씀 |
+| `~/.homebrew/Brewfile.optional` | 상황에 따라 켜는 패키지. 손으로 관리, 주석이 유지됨 |
 
 ## 패키지 관리
 
@@ -100,10 +101,27 @@ chezmoi add ~/.homebrew/Brewfile    # 소스에 반영
 덮어쓰기 때문에 템플릿이면 조건문이 매번 날아갑니다. OS 분기는 파일이 아니라 설치 스크립트에
 두었습니다.
 
+**상황에 따라 켜는 패키지** — `~/.homebrew/Brewfile.optional` 에 주석 상태로 보관합니다.
+
+```ruby
+# --- 주변기기 / 하드웨어 의존 ---
+# cask "displaylink"       # DisplayLink 도킹스테이션 드라이버
+# cask "logi-options+"     # 로지텍 마우스·키보드 설정 앱
+```
+
+필요한 줄의 주석을 풀고 `chezmoi apply` 하면 설치됩니다. 전부 주석 상태면 설치 스크립트가
+이 파일을 아예 건너뜁니다.
+
+**메인 Brewfile 에는 주석을 달지 마세요.** `brew bundle dump` 가 파일을 통째로 덮어쓰기
+때문에 다음 덤프에서 사라집니다. `dump` 가 건드리지 않는 파일이 필요해서 분리한 것입니다.
+
+> 이 파일도 저장소에 커밋되므로 주석을 풀면 모든 머신에 전파됩니다. Mac 이 한 대인 동안은
+> 문제가 없고, 두 대가 되면 그때 머신별로 나눕니다.
+
 **다른 머신에 반영** — `chezmoi update` 한 번이면 pull → apply → 패키지 설치까지 이어집니다.
 
-> 도킹스테이션 드라이버나 주변기기 유틸리티처럼 특정 기기에서만 의미 있는 cask 는
-> 덤프 후 손으로 빼주세요. 회사/개인 Brewfile 분리는 두 번째 Mac 이 생기면 그때 합니다.
+> 덤프에 특정 기기에서만 의미 있는 cask 가 딸려 들어왔으면 메인 Brewfile 에서 빼고
+> `Brewfile.optional` 로 옮겨두세요. 회사/개인 Brewfile 분리는 두 번째 Mac 이 생기면 그때 합니다.
 
 ## 요구사항 / 현재 한계
 

@@ -1,0 +1,14 @@
+# 상황에 따라 켜는 패키지 목록.
+#
+# `brew bundle dump` 는 이 파일을 건드리지 않으므로 주석이 살아남습니다.
+# (메인 Brewfile 에 주석을 달면 다음 dump 에서 날아갑니다.)
+#
+# 필요한 줄의 주석을 풀고 `chezmoi apply` 하면 설치됩니다.
+# 되돌리려면 다시 주석 처리 — 단 이미 설치된 것을 지우지는 않습니다.
+
+# --- 주변기기 / 하드웨어 의존 ---
+# cask "displaylink"       # DisplayLink 도킹스테이션 드라이버
+# cask "logi-options+"     # 로지텍 마우스·키보드 설정 앱
+
+# --- 기타 ---
+# cask "caskhub"
