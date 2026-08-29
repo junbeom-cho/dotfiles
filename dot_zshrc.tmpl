@@ -1,3 +1,10 @@
+{{- $share := "/usr/share" -}}
+{{- $nvm := "$HOME/.nvm" -}}
+{{- if eq .chezmoi.os "darwin" -}}
+{{-   $brew := ternary "/opt/homebrew" "/usr/local" (eq .chezmoi.arch "arm64") -}}
+{{-   $share = printf "%s/share" $brew -}}
+{{-   $nvm = printf "%s/opt/nvm" $brew -}}
+{{- end -}}
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -79,7 +86,7 @@ ZSH_THEME="robbyrussell"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git)
 
-source $ZSH/oh-my-zsh.sh
+[[ -r "$ZSH/oh-my-zsh.sh" ]] && source "$ZSH/oh-my-zsh.sh"
 
 # User configuration
 
@@ -109,25 +116,33 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-alias ls="lsd"
-alias ll="lsd -al"
-alias cat="bat --plain"
+command -v lsd >/dev/null && { alias ls="lsd"; alias ll="lsd -al"; }
+command -v bat >/dev/null && alias cat="bat --plain"
 
-export SSH_AUTH_SOCK=/Users/junbeom/.bitwarden-ssh-agent.sock
+# Bitwarden SSH agent
+[[ -S "$HOME/.bitwarden-ssh-agent.sock" ]] && export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
 
-source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-export PATH="$HOME/.jenv/bin:$PATH"
-eval "$(jenv init -)"
-
-source /opt/homebrew/share/powerlevel10k/powerlevel10k.zsh-theme
+# zsh 플러그인 / 테마 (설치된 것만 로드)
+for f in zsh-autosuggestions/zsh-autosuggestions.zsh \
+         zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+         powerlevel10k/powerlevel10k.zsh-theme; do
+  [[ -r "{{ $share }}/$f" ]] && source "{{ $share }}/$f"
+done
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# jenv
+[[ -d "$HOME/.jenv/bin" ]] && export PATH="$HOME/.jenv/bin:$PATH"
+command -v jenv >/dev/null && eval "$(jenv init -)"
+
+# nvm
 export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+nvm_prefix="{{ $nvm }}"
+[ -s "$nvm_prefix/nvm.sh" ] && \. "$nvm_prefix/nvm.sh"
+for c in "$nvm_prefix/etc/bash_completion.d/nvm" "$NVM_DIR/bash_completion"; do
+  [ -s "$c" ] && \. "$c" && break
+done
+unset nvm_prefix
